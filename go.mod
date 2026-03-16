@@ -1,4 +1,4 @@
-module github.com/EternalHalve/sky-quotes
+module github.com/EternalHalve/gopher-wisdom
 
 go 1.26.1
 

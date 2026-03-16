@@ -9,6 +9,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/quotes", quotes.GetQuotes)
+	router.GET("/quotes/:id", quotes.GetQuotesByID)
 	router.POST("/quotes", quotes.PostQuotes)
 
 	router.Run("localhost:8080")

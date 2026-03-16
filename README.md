@@ -19,8 +19,9 @@ A lightweight REST API built in Go using the Gin Gonic framework. This service s
 ---
 
 ### Public Endpoints
-The following sectors are currently broadcasting on the public frequency:
+The following sectors are accessible for the general public:
 - `GET /quotes` - Retrieve the entire collective consciousness of the archive.
+- `GET /quotes/:id` - Retrieve the chosen consciousness of the archive by its associated ID.
 - `POST /quotes` — Append a new transmission to the archive.
 
 ---
@@ -33,7 +34,7 @@ This project utilizes `just` as a command runner for streamlined operations. Exe
 | :--- | :--- |
 | `just awaken` | Initiates the REST service. |
 | `just fetch` | Queries the archive for all stored quotes. |
-| `just post` | Transmits the predefined Naruto quote to the archive. |
+| `just post` | Transmits the predefined quote to the archive. |
 
 ---
 
@@ -47,5 +48,5 @@ cd gopher-wisdom
 go mod tidy
 
 # Awaken the service (manually)
-go run cmd/sky-quotes/main.go
+go run cmd/gopher-wisdom/main.go
 ```

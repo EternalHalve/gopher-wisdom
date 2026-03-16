@@ -2,6 +2,7 @@ package quotes
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +24,24 @@ var QuotesList = []Quote{
 
 func GetQuotes(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, QuotesList)
+}
+
+func GetQuotesByID(c *gin.Context) {
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID format"})
+		return
+	}
+
+	for _, a := range QuotesList {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Quotes not found"})
 }
 
 func PostQuotes(c *gin.Context) {

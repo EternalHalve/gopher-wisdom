@@ -1,43 +1,64 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"os"
+	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/EternalHalve/gopher-wisdom/internal/config"
 	"github.com/EternalHalve/gopher-wisdom/internal/quotes"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
+func startStatusWorker(ctx context.Context) {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	log.Println("Background: Worker started")
+
+	for {
+		select {
+		case <-ticker.C:
+			log.Println("Background: Server is healthy...")
+		case <-ctx.Done():
+			log.Println("Background: Worker shutting down gracefully...")
+			return
+		}
+	}
+}
+
 func main() {
-	err := godotenv.Load()
+	cfg := config.Load()
+	cfg.DB.AutoMigrate(&quotes.Quote{})
 
-	if err != nil {
-		fmt.Println("Warning: No .env file found")
-	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	dbName := os.Getenv("DB_NAME")
-	if dbName == "" {
-		dbName = "wisdom.db"
-	}
-
-	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Fatal: Could not connect to database: %v", err)
-	}
-
-	db.AutoMigrate(&quotes.Quote{})
-
-	quoteHandler := quotes.NewQuoteHandler(db)
+	go startStatusWorker(ctx)
 
 	router := gin.Default()
+	quotes.RegisterRoutes(router, cfg.DB)
 
-	router.GET("/quotes", quoteHandler.GetQuotes)
-	router.GET("/quotes/:id", quoteHandler.GetQuotesByID)
-	router.POST("/quotes", quoteHandler.PostQuotes)
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
 
-	router.Run("localhost:8080")
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Listen error: %s\n", err)
+		}
+	}()
+
+	log.Println("Server started on :8080")
+
+	<-ctx.Done()
+
+	log.Println("Shutting down...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	srv.Shutdown(shutdownCtx)
 }

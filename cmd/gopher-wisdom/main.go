@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	quotes.InitDatabase()
+
 	router := gin.Default()
 
 	router.GET("/quotes", quotes.GetQuotes)

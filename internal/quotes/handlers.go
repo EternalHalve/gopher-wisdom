@@ -2,55 +2,49 @@ package quotes
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var QuotesList = []Quote{
-	{
-		ID:        1,
-		Content:   "That wherever you are in the world, I'll search for you",
-		Anime:     "Your Name",
-		Character: "Taki",
-	},
-	{
-		ID:        2,
-		Content:   "A man must raise more grain than he has trampled in his life. His hands must build more homes than they have burned.",
-		Anime:     "Vinland Saga",
-		Character: "Thorfinn",
-	},
+var DB *gorm.DB
+
+func InitDatabase() {
+	var err error
+	DB, err = gorm.Open(sqlite.Open("wisdom.db"), &gorm.Config{})
+	if err != nil {
+		panic("Failed to connect to database")
+	}
+
+	DB.AutoMigrate(&Quote{})
 }
 
 func GetQuotes(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, QuotesList)
+	var quotes []Quote
+	DB.Find(&quotes)
+	c.IndentedJSON(http.StatusOK, quotes)
 }
 
 func GetQuotesByID(c *gin.Context) {
-	idStr := c.Param("id")
+	id := c.Param("id")
+	var quote Quote
 
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid ID format"})
+	if err := DB.First(&quote, id).Error; err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Quote not found"})
 		return
 	}
 
-	for _, a := range QuotesList {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Quotes not found"})
+	c.IndentedJSON(http.StatusOK, quote)
 }
 
 func PostQuotes(c *gin.Context) {
-	var NewQuotes Quote
+	var newQuote Quote
 
-	if err := c.BindJSON(&NewQuotes); err != nil {
+	if err := c.BindJSON(&newQuote); err != nil {
 		return
 	}
 
-	QuotesList = append(QuotesList, NewQuotes)
-	c.IndentedJSON(http.StatusCreated, NewQuotes)
+	DB.Create(&newQuote) // INSERT INTO quotes ...
+	c.IndentedJSON(http.StatusCreated, newQuote)
 }

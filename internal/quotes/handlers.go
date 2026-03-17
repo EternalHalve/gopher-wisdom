@@ -4,33 +4,28 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
-func InitDatabase() {
-	var err error
-	DB, err = gorm.Open(sqlite.Open("wisdom.db"), &gorm.Config{})
-	if err != nil {
-		panic("Failed to connect to database")
-	}
-
-	DB.AutoMigrate(&Quote{})
+type QuoteHandler struct {
+	DB *gorm.DB
 }
 
-func GetQuotes(c *gin.Context) {
+func NewQuoteHandler(db *gorm.DB) *QuoteHandler {
+	return &QuoteHandler{DB: db}
+}
+
+func (handler *QuoteHandler) GetQuotes(c *gin.Context) {
 	var quotes []Quote
-	DB.Find(&quotes)
+	handler.DB.Find(&quotes)
 	c.IndentedJSON(http.StatusOK, quotes)
 }
 
-func GetQuotesByID(c *gin.Context) {
+func (handler *QuoteHandler) GetQuotesByID(c *gin.Context) {
 	id := c.Param("id")
 	var quote Quote
 
-	if err := DB.First(&quote, id).Error; err != nil {
+	if err := handler.DB.First(&quote, id).Error; err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Quote not found"})
 		return
 	}
@@ -38,13 +33,13 @@ func GetQuotesByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, quote)
 }
 
-func PostQuotes(c *gin.Context) {
+func (handler *QuoteHandler) PostQuotes(c *gin.Context) {
 	var newQuote Quote
 
 	if err := c.BindJSON(&newQuote); err != nil {
 		return
 	}
 
-	DB.Create(&newQuote) // INSERT INTO quotes ...
+	handler.DB.Create(&newQuote)
 	c.IndentedJSON(http.StatusCreated, newQuote)
 }

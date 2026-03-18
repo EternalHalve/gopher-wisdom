@@ -13,6 +13,7 @@ A lightweight, modular REST API built in Go. This service serves a curated colle
 
 ### Technical Dossier
 * **Modern Engine**: Powered by `Gin Gonic` for high-concurrency routing and rapid JSON serialization.
+* **Containerized Environment**: Fully Dockerized using multi-stage builds for a minimal runtime footprint
 * **Persistent Storage**: Integrated with `SQLite` via `GORM` with automated schema migrations.
 * **Asynchronous Workers**: Features a background `statusWorker` for real-time service monitoring and graceful shutdown handling.
 * **Modular Architecture**: Follows the Standard Go Project Layout with logic encapsulated in `internal/` to ensure a clean, decoupled dependency graph.
@@ -33,7 +34,11 @@ This project utilizes `just` as a command runner. Execute these from the root di
 
 | Command | Action |
 | :--- | :--- |
-| `just awaken` | Initiates the REST service and background workers. |
+| `just awaken` | [Primary] Builds and awakens the Dockerized service in detached mode. |
+| `just sleep` | Collapses the containerized environment. |
+| `just logs` | Streams the real-time heartbeat and server logs from the container. |
+| `just up` | Initiates the REST service locally. |
+| `just clean` | Clean up Docker images and the local data folder |
 | `just fetch` | Queries the database for all stored quotes. |
 | `just post` | Transmits the predefined quote to the database. |
 
@@ -46,10 +51,10 @@ git clone [https://github.com/EternalHalve/gopher-wisdom.git](https://github.com
 cd gopher-wisdom
 
 # Configure Environment
-cp .env.example .env  # Ensure DB_NAME is defined
+cp .env.example .env
 
-# Initialize and sync modules
-go mod tidy
+# Awaken the service
+just awaken
 
-# Awaken the service (manually)
-go run cmd/server/main.go
+# Begone, trash
+just clean

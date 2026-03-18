@@ -36,7 +36,8 @@ func (handler *QuoteHandler) GetQuotesByID(c *gin.Context) {
 func (handler *QuoteHandler) PostQuotes(c *gin.Context) {
 	var newQuote Quote
 
-	if err := c.BindJSON(&newQuote); err != nil {
+	if err := c.ShouldBindJSON(&newQuote); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

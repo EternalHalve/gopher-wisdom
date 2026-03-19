@@ -30,3 +30,6 @@ post:
 clean:
     docker compose down --rmi all
     rm -rf ./data
+
+test:
+    go test -v ./internal/quotes

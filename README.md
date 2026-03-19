@@ -13,10 +13,10 @@ A lightweight, modular REST API built in Go. This service serves a curated colle
 
 ### Technical Dossier
 * **Modern Engine**: Powered by `Gin Gonic` for high-concurrency routing and rapid JSON serialization.
+* **Traffic Control**: Integrated Rate Limiting via `limiter` to protect the archives from over-extraction.
 * **Containerized Environment**: Fully Dockerized using multi-stage builds for a minimal runtime footprint
 * **Persistent Storage**: Integrated with `SQLite` via `GORM` with automated schema migrations.
 * **Asynchronous Workers**: Features a background `statusWorker` for real-time service monitoring and graceful shutdown handling.
-* **Modular Architecture**: Follows the Standard Go Project Layout with logic encapsulated in `internal/` to ensure a clean, decoupled dependency graph.
 
 ---
 

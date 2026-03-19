@@ -11,6 +11,10 @@ import (
 	"github.com/EternalHalve/gopher-wisdom/internal/config"
 	"github.com/EternalHalve/gopher-wisdom/internal/quotes"
 	"github.com/gin-gonic/gin"
+
+	"github.com/ulule/limiter/v3"
+	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 func startStatusWorker(ctx context.Context) {
@@ -34,12 +38,29 @@ func main() {
 	cfg := config.Load()
 	cfg.DB.AutoMigrate(&quotes.Quote{})
 
+	rate := limiter.Rate{
+		Period: 1 * time.Second,
+		Limit:  5,
+	}
+
+	store := memory.NewStore()
+
+	instance := limiter.New(store, rate)
+
+	middleware := mgin.NewMiddleware(instance, mgin.WithLimitReachedHandler(func(c *gin.Context) {
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"error": "The tunnels are too crowded, traveler.",
+			"hint":  "Wait for the dust to settle before seeking more wisdom.",
+		})
+	}))
+
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	go startStatusWorker(ctx)
 
 	router := gin.Default()
+	router.Use(middleware)
 	quotes.RegisterRoutes(router, cfg.DB)
 
 	srv := &http.Server{

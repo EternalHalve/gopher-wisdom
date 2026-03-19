@@ -26,7 +26,10 @@ func (handler *QuoteHandler) GetQuotesByID(c *gin.Context) {
 	var quote Quote
 
 	if err := handler.DB.First(&quote, id).Error; err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Quote not found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{
+			"error": "The requested fragment of wisdom remains undiscovered in these tunnels.",
+			"hint":  "Perhaps the archives are incomplete, or your path lies elsewhere.",
+		})
 		return
 	}
 

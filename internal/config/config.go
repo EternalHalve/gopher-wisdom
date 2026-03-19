@@ -15,7 +15,7 @@ type Config struct {
 
 func Load() *Config {
 	if err := godotenv.Load(); err != nil {
-		log.Println("Info: No .env file found")
+		log.Println("Gopher Wisdom: No external environment (.env) found. Relying on internal defaults.")
 	}
 
 	dbName := os.Getenv("DB_NAME")
@@ -25,8 +25,10 @@ func Load() *Config {
 
 	db, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Fatal: Could not connect to database: %v", err)
+		log.Fatalf("Gopher Wisdom: The archives are buried too deep! Error: %v", err)
 	}
+
+	log.Printf("Gopher Wisdom: Connected to the source of truth [%s]\n", dbName)
 
 	return &Config{DB: db}
 }

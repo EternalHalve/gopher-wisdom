@@ -17,14 +17,14 @@ func startStatusWorker(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
-	log.Println("Background: Worker started")
+	log.Println("Gopher Wisdom: The watcher has taken its post in the tunnels.")
 
 	for {
 		select {
 		case <-ticker.C:
-			log.Println("Background: Server is healthy...")
+			log.Println("Gopher Wisdom: Still digging, still healthy. All tunnels are clear.")
 		case <-ctx.Done():
-			log.Println("Background: Worker shutting down gracefully...")
+			log.Println("Gopher Wisdom: The sun sets. Returning to the burrow gracefully...	")
 			return
 		}
 	}
@@ -49,16 +49,22 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Listen error: %s\n", err)
+			log.Fatalf("The tunnels have collapsed: %s\n", err)
 		}
 	}()
 
-	log.Println("Server started on :8080")
+	log.Println("Gopher Wisdom is manifest at :8080. Seek and ye shall find.")
 
 	<-ctx.Done()
 
-	log.Println("Shutting down...")
+	log.Println("A sign from above! Commencing the Great Hibernation...")
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	srv.Shutdown(shutdownCtx)
+
+	sqlDB, err := cfg.DB.DB()
+	if err == nil {
+		log.Println("Sealing the archives. Rest well, little Gopher.")
+		sqlDB.Close()
+	}
 }

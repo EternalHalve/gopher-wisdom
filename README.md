@@ -56,5 +56,5 @@ cp .env.example .env
 # Awaken the service
 just awaken
 
-# Begone, trash
+# Cleaning up the trash
 just clean

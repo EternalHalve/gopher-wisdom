@@ -37,6 +37,8 @@ func startStatusWorker(ctx context.Context) {
 func main() {
 	cfg := config.Load()
 	cfg.DB.AutoMigrate(&quotes.Quote{})
+	quotes.SeedData(cfg.DB)
+	log.Println("Gopher Wisdom: Tunnels reinforced and wisdom fragments inscribed upon the walls. The library is ready.")
 
 	rate := limiter.Rate{
 		Period: 1 * time.Second,

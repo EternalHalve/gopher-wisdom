@@ -1,6 +1,7 @@
 package quotes
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -40,10 +41,30 @@ func (handler *QuoteHandler) PostQuotes(c *gin.Context) {
 	var newQuote Quote
 
 	if err := c.ShouldBindJSON(&newQuote); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	handler.DB.Create(&newQuote)
 	c.IndentedJSON(http.StatusCreated, newQuote)
+}
+
+func SeedData(db *gorm.DB) {
+	var count int64
+
+	if err := db.Model(&Quote{}).Count(&count).Error; err != nil {
+		return
+	}
+
+	if count == 0 {
+		quotes := []Quote{
+			{Content: "I have no enemies... No one has any enemies", Anime: "Vinland Saga", Character: "Thorfinn"},
+			{Content: "No matter how hard or impossible it is, never lose sight of your goal", Anime: "One Piece", Character: "Luffy"},
+			{Content: "If I don't wield the sword, I can't protect you", Anime: "Bleach", Character: "Ichigo"},
+		}
+
+		if err := db.Create(&quotes).Error; err != nil {
+			log.Printf("Could not seed: %v", err)
+		}
+	}
 }

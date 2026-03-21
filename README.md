@@ -24,7 +24,7 @@ A lightweight, modular REST API built in Go. This service serves a curated colle
 The following sectors are accessible (API Version: `v1`):
 - `GET /api/v1/quotes` - Retrieve the entire collective quotes from the database.
 - `GET /api/v1/quotes/:id` - Query the database for the chosen quote by its associated ID.
-- `POST /api/v1/quotes` — Append a new transmission to the database.
+- `POST /api/v1/quotes` - Append a new transmission to the database.
 
 ---
 

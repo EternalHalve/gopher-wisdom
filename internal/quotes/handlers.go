@@ -24,6 +24,7 @@ func (handler *QuoteHandler) GetQuotes(c *gin.Context) {
 
 func (handler *QuoteHandler) GetQuotesByID(c *gin.Context) {
 	id := c.Param("id")
+	format := c.Query("format")
 	var quote Quote
 
 	if err := handler.DB.First(&quote, id).Error; err != nil {
@@ -34,7 +35,18 @@ func (handler *QuoteHandler) GetQuotesByID(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, quote)
+	response := gin.H{
+		"content":   quote.Content,
+		"character": quote.Character,
+		"anime":     quote.Anime,
+	}
+
+	if format == "alien" {
+		response["content"] = Alienify(quote.Content)
+		response["dialect"] = "Zorgon-7"
+	}
+
+	c.IndentedJSON(http.StatusOK, response)
 }
 
 func (handler *QuoteHandler) PostQuotes(c *gin.Context) {

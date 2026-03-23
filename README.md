@@ -11,17 +11,27 @@ A lightweight, modular REST API built in Go. This service serves a curated colle
 
 ---
 
-### Technical Dossier
-* **Modern Engine**: Powered by `Gin Gonic` for high-concurrency routing and rapid JSON serialization.
-* **Traffic Control**: Integrated Rate Limiting via `limiter` to protect the archives from over-extraction.
-* **Containerized Environment**: Fully Dockerized using multi-stage builds for a minimal runtime footprint
-* **Persistent Storage**: Integrated with `SQLite` via `GORM` with automated schema migrations.
-* **Asynchronous Workers**: Features a background `statusWorker` for real-time service monitoring and graceful shutdown handling.
+### ✦ Technical Dossier
+
+- **Modern Engine**  
+  Powered by `Gin Gonic` for high-concurrency routing and fast JSON serialization.
+
+- **Traffic Control**  
+  Integrated rate limiting via `limiter` to prevent over-extraction.
+
+- **Containerized Environment**  
+  Fully Dockerized with multi-stage builds for a minimal runtime footprint.
+
+- **Persistent Storage**  
+  Uses `SQLite` with `GORM`, including automated schema migrations.
+
+- **Asynchronous Workers**  
+  Background `statusWorker` handles real-time monitoring and graceful shutdowns.
 
 ---
 
-### Public Endpoints
-The following sectors are accessible (API Version: `v1`):
+### ✦ Public Endpoints (v1)
+
 - `GET /api/v1/quotes` - Retrieve the entire collective quotes from the database.
 - `GET /api/v1/quotes/:id` - Query the database for the chosen quote by its associated ID.
 - `GET /api/v1/quotes/:id?format=alien` - [NEW] Decrypt the transmission into Zorgon-7 dialect.
@@ -29,23 +39,23 @@ The following sectors are accessible (API Version: `v1`):
 
 ---
 
-### Command
+### ✦ Command Interface
 
-This project utilizes `just` as a command runner. Execute these from the root directory:
+This project utilizes `just` as a command runner. Execute these from the root directory.
 
 | Command | Action |
-| :--- | :--- |
-| `just awaken` | [Primary] Builds and awakens the Dockerized service in detached mode. |
-| `just sleep` | Collapses the containerized environment. |
-| `just logs` | Streams the real-time heartbeat and server logs from the container. |
-| `just up` | Initiates the REST service locally. |
-| `just clean` | Clean up Docker images and the local data folder |
-| `just fetch` | Queries the database for all stored quotes. |
-| `just post` | Transmits the predefined quote to the database. |
+|:--|:--|
+| `just awaken` | **[Primary]** Build and start the Dockerized service (detached) |
+| `just sleep` | Stop the containerized environment |
+| `just logs` | Stream real-time server logs |
+| `just up` | Run the service locally |
+| `just clean` | Remove Docker images and local data |
+| `just fetch` | Retrieve all stored quotes |
+| `just post` | Insert a predefined quote |
 
 ---
 
-### Technical Setup
+### ✦ Technical Setup
 ```bash
 # Clone
 git clone [https://github.com/EternalHalve/gopher-wisdom.git](https://github.com/EternalHalve/gopher-wisdom.git)
